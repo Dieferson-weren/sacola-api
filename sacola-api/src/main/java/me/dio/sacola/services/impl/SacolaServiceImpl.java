@@ -40,19 +40,29 @@ public class SacolaServiceImpl implements SacolaService {
             Restaurante restauranteAtual = sacola.getItens().get(0).getProduto().getRestaurante();
             Restaurante restauranteAserAdicionado = itensParaAdicionar.getProduto().getRestaurante();
             if(restauranteAtual.equals(restauranteAserAdicionado)){
-                itensDaSacola.add((itensParaAdicionar));
+                if(itensDaSacola.stream().anyMatch(item -> item.getProduto().getId().equals(itensParaAdicionar.getProduto().getId()))){
+                    itensDaSacola.forEach(item -> {if (item.getProduto().getId() == itensParaAdicionar.getProduto().getId()){
+                        item.setQuantidade( item.getQuantidade() + itensParaAdicionar.getQuantidade());}
+                    });
+                }else {
+                    itensDaSacola.add((itensParaAdicionar));
+                }
+
+
+
+
             }else{
                 throw new RuntimeException("Não é possível inserir produtos de outro restaurante. Feche a sacola ou esvazie.");
             }
         }
 
-        List<Double> valorDosItens = new ArrayList<>();
-        for(Item item : itensDaSacola){
+        Double valorDosItens = 0.0;
+        for(Item item : itensDaSacola) {
+
             double valorTotalDosItens = item.getProduto().getValorUnitario() * item.getQuantidade();
-            valorDosItens.add(valorTotalDosItens);
+            valorDosItens += valorTotalDosItens;
         }
-        double valorTotal = valorDosItens.stream().mapToDouble(item -> item).sum();
-        sacola.setValorTotal(valorTotal);
+        sacola.setValorTotal(valorDosItens);
         sacolaRepository.save(sacola);
         return itensParaAdicionar;
     }
