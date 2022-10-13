@@ -31,7 +31,7 @@ public class Sacola {
     private List<Item> itens;
     private Double valorTotal;
 
-    @Enumerated
+    @Enumerated(value = EnumType.ORDINAL)
     private FormaPagamento formaPagamento;
     private boolean fechada;
 }

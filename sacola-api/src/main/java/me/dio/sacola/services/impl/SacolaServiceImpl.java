@@ -1,6 +1,7 @@
 package me.dio.sacola.services.impl;
 
 import lombok.RequiredArgsConstructor;
+import me.dio.sacola.enumeration.FormaPagamento;
 import me.dio.sacola.model.Item;
 import me.dio.sacola.model.Restaurante;
 import me.dio.sacola.model.Sacola;
@@ -11,7 +12,6 @@ import me.dio.sacola.resource.dto.ItemDto;
 import me.dio.sacola.services.SacolaService;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -47,22 +47,16 @@ public class SacolaServiceImpl implements SacolaService {
                 }else {
                     itensDaSacola.add((itensParaAdicionar));
                 }
-
-
-
-
             }else{
                 throw new RuntimeException("Não é possível inserir produtos de outro restaurante. Feche a sacola ou esvazie.");
             }
         }
-
-        Double valorDosItens = 0.0;
+        Double valorTotal = 0.0;
         for(Item item : itensDaSacola) {
-
             double valorTotalDosItens = item.getProduto().getValorUnitario() * item.getQuantidade();
-            valorDosItens += valorTotalDosItens;
+            valorTotal += valorTotalDosItens;
         }
-        sacola.setValorTotal(valorDosItens);
+        sacola.setValorTotal(valorTotal);
         sacolaRepository.save(sacola);
         return itensParaAdicionar;
     }
@@ -73,7 +67,11 @@ public class SacolaServiceImpl implements SacolaService {
     }
 
     @Override
-    public Sacola fecharSacola(long id, int formaPagamento) {
-        return null;
+    public Sacola fecharSacola(long id, FormaPagamento formaPagamento) {
+        Sacola sacola = verSacola(id);
+        sacola.setFormaPagamento(formaPagamento);
+        sacola.setFechada(true);
+        sacolaRepository.save(sacola);
+        return sacola;
     }
 }
