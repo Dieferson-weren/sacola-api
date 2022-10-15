@@ -1,4 +1,4 @@
-package me.dio.sacola.resource;
+package me.dio.sacola.resource.controller;
 
 import lombok.RequiredArgsConstructor;
 import me.dio.sacola.enumeration.FormaPagamento;

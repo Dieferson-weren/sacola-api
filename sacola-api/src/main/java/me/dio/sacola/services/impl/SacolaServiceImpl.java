@@ -2,6 +2,10 @@ package me.dio.sacola.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import me.dio.sacola.enumeration.FormaPagamento;
+import me.dio.sacola.exception.ProdutoNaoEncontradoException;
+import me.dio.sacola.exception.ProdutosException;
+import me.dio.sacola.exception.SacolaException;
+import me.dio.sacola.exception.SacolaNaoEncontradaException;
 import me.dio.sacola.model.Item;
 import me.dio.sacola.model.Restaurante;
 import me.dio.sacola.model.Sacola;
@@ -25,13 +29,13 @@ public class SacolaServiceImpl implements SacolaService {
     public Item adicionarItemNaSacola(ItemDto itemDto) {
         Sacola sacola = verSacola(itemDto.getSacolaId());
         if(sacola.isFechada()){
-            throw  new RuntimeException("Esta sacola está fechada");
+            throw  new SacolaException("Esta sacola está fechada");
         }
         Item itensParaAdicionar = Item.builder()
                 .quantidade(itemDto.getQuantidade())
                 .sacola(sacola)
                 .produto(produtoRepository.findById(itemDto.getProdutoId())
-                        .orElseThrow(() -> {throw new RuntimeException("Produto não encontradio");}))
+                        .orElseThrow(() -> {throw new ProdutoNaoEncontradoException("Produto não encontrado");}))
                 .build();
         List<Item> itensDaSacola = sacola.getItens();
         if(itensDaSacola.isEmpty()){
@@ -48,7 +52,7 @@ public class SacolaServiceImpl implements SacolaService {
                     itensDaSacola.add((itensParaAdicionar));
                 }
             }else{
-                throw new RuntimeException("Não é possível inserir produtos de outro restaurante. Feche a sacola ou esvazie.");
+                throw new ProdutosException("Não é possível inserir produtos de outro restaurante. Feche a sacola ou esvazie.");
             }
         }
         Double valorTotal = 0.0;
@@ -63,7 +67,7 @@ public class SacolaServiceImpl implements SacolaService {
 
     @Override
     public Sacola verSacola(long id) {
-        return sacolaRepository.findById(id).orElseThrow(() -> {throw new RuntimeException("Sacola Não encontrada");});
+        return sacolaRepository.findById(id).orElseThrow(() -> {throw new SacolaNaoEncontradaException("Sacola Não encontrada");});
     }
 
     @Override
