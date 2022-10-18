@@ -7,15 +7,9 @@ import java.util.List;
 
 public class ApiErrors {
     @Getter
-    private List<String> errors;
+    private String errors;
 
     public ApiErrors(String errors){
-        this.errors = Arrays.asList(errors);
-    }
-
-    public ApiErrors(List<String> errors){
-        super();
         this.errors = errors;
     }
-
 }
