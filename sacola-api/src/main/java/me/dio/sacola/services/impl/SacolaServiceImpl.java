@@ -17,6 +17,7 @@ import me.dio.sacola.services.SacolaService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -44,12 +45,15 @@ public class SacolaServiceImpl implements SacolaService {
             Restaurante restauranteAtual = sacola.getItens().get(0).getProduto().getRestaurante();
             Restaurante restauranteAserAdicionado = itensParaAdicionar.getProduto().getRestaurante();
             if(restauranteAtual.equals(restauranteAserAdicionado)){
-                if(itensDaSacola.stream().anyMatch(item -> item.getProduto().getId().equals(itensParaAdicionar.getProduto().getId()))){
-                    itensDaSacola.forEach(item -> {if (item.getProduto().getId() == itensParaAdicionar.getProduto().getId()){
-                        item.setQuantidade( item.getQuantidade() + itensParaAdicionar.getQuantidade());}
-                    });
-                }else {
-                    itensDaSacola.add((itensParaAdicionar));
+                Item item = itemRepository.encontrarPorProdutoeSacola(itensParaAdicionar.getProduto().getId(),
+                        itensParaAdicionar.getSacola().getId());
+
+                if(item != null){
+                    itensDaSacola
+                            .get(itensDaSacola.indexOf(item))
+                            .setQuantidade(item.getQuantidade() + itensParaAdicionar.getQuantidade());
+                }else{
+                    itensDaSacola.add(itensParaAdicionar);
                 }
             }else{
                 throw new ProdutosException("Não é possível inserir produtos de outro restaurante. Feche a sacola ou esvazie.");
